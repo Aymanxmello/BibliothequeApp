@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.webkit.URLUtil
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate // Import for theme switching
+import android.content.Context // Import for SharedPreferences
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.lang.NumberFormatException
@@ -20,8 +22,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var urlInput: EditText
     private lateinit var availableCheckbox: CheckBox
     private lateinit var addButton: Button
+    // Variable for Dark Mode Switch
+    private lateinit var darkModeSwitch: Switch
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // 1. Load the saved theme preference before calling super.onCreate()
+        val sharedPrefs = getSharedPreferences("ThemePrefs", Context.MODE_PRIVATE)
+        val isDarkMode = sharedPrefs.getBoolean("isDarkMode", false) // false is default (Light Mode)
+        applyTheme(isDarkMode)
+
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -37,7 +47,20 @@ class MainActivity : AppCompatActivity() {
         urlInput = findViewById(R.id.urlInput)
         availableCheckbox = findViewById(R.id.disponibleCheckbox)
         addButton = findViewById(R.id.addButton)
-        // Dark Mode switch is ignored here for simplicity, but you can add its listener
+
+        // Initialize and set the state of the Dark Mode switch
+        darkModeSwitch = findViewById(R.id.darkModeSwitch)
+        darkModeSwitch.isChecked = isDarkMode // Set the switch state based on the applied theme
+
+        // Add its listener for dark/light mode toggle
+        darkModeSwitch.setOnCheckedChangeListener { _, checked ->
+            applyTheme(checked)
+            // Save preference
+            sharedPrefs.edit().putBoolean("isDarkMode", checked).apply()
+            // Recreate the activity for theme change to take effect immediately
+            recreate()
+        }
+
 
         // 2. Setup RecyclerView
         val recyclerView: RecyclerView = findViewById(R.id.recyclerView)
@@ -50,6 +73,15 @@ class MainActivity : AppCompatActivity() {
         // 7. Handle 'Ajouter' button click
         addButton.setOnClickListener {
             addNewLivre()
+        }
+    }
+
+    // Theme application function
+    private fun applyTheme(isDarkMode: Boolean) {
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         }
     }
 

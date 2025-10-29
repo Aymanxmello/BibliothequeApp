@@ -1,7 +1,5 @@
 package com.example.bibliothequeapp
 
-
-
 data class Livre(
     val titre: String,
     val prix: Double,

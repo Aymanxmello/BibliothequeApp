@@ -15,7 +15,6 @@ import com.bumptech.glide.Glide // Used for loading images from URL
 class AdapterLivres(private val livresList: MutableList<Livre>) :
     RecyclerView.Adapter<AdapterLivres.LivreViewHolder>() {
 
-    // 4. Inner class to hold the views (like a container for livre_item.xml elements)
     class LivreViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.findViewById(R.id.titleTextView)
         val price: TextView = itemView.findViewById(R.id.priceTextView)
@@ -24,7 +23,6 @@ class AdapterLivres(private val livresList: MutableList<Livre>) :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LivreViewHolder {
-        // Inflate the custom layout (livre_item.xml)
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.livre_item, parent, false)
         return LivreViewHolder(view)
@@ -33,18 +31,15 @@ class AdapterLivres(private val livresList: MutableList<Livre>) :
     override fun onBindViewHolder(holder: LivreViewHolder, position: Int) {
         val currentLivre = livresList[position]
 
-        // Put the data into the item views
         holder.title.text = currentLivre.titre
         holder.price.text = "Prix: ${String.format("%.2f", currentLivre.prix)} DH"
         holder.available.isChecked = currentLivre.disponible
 
-        // Load image using Glide library (requires setup in build.gradle)
         Glide.with(holder.itemView.context)
             .load(currentLivre.imageUrl)
             .placeholder(R.drawable.ic_book_placeholder) // Use a temporary image if loading fails
             .into(holder.image)
 
-        // 5. Set click listener to show dialog
         holder.itemView.setOnClickListener {
             showLivreDetailsDialog(holder.itemView.context, currentLivre)
         }
@@ -52,25 +47,22 @@ class AdapterLivres(private val livresList: MutableList<Livre>) :
 
     override fun getItemCount() = livresList.size
 
-    // Function for adding a new book (called from MainActivity)
     fun addBook(livre: Livre) {
-        livresList.add(0, livre) // Add to the top
-        notifyItemInserted(0) // Tell the RecyclerView to refresh the first item
+        livresList.add(0, livre)
+        notifyItemInserted(0)
     }
 
-    // 5. Function to display the book details in a dialog
     private fun showLivreDetailsDialog(context: Context, livre: Livre) {
-        // Prepare the availability status with the required color
         val availabilityText = TextView(context).apply {
             text = if (livre.disponible) {
-                setTextColor(Color.GREEN) // Green text for Disponible
+                setTextColor(Color.GREEN)
                 "Disponibilité : Disponible"
             } else {
-                setTextColor(Color.RED) // Red text for Non disponible
+                setTextColor(Color.RED)
                 "Disponibilité : Non disponible"
             }
             textSize = 16f
-            setPadding(40, 20, 40, 20) // Add padding for better look
+            setPadding(40, 20, 40, 20)
         }
 
         val message = "Titre: ${livre.titre}\n" +
